@@ -24,13 +24,20 @@
     "custom": "",
     "banner728": "",
     "banner320": "",
-    "banner300": ""
+    "banner300": "",
+    "head_enabled": false,
+    "head_code": "",
+    "body_enabled": false,
+    "body_code": ""
   },
   "analytics": {
     "provider": "none"
   },
-  "embed_server": "https://vidsrc.xyz/embed/movie/{tmdb}",
+  "embed_server": "https:\/\/vidsrc.xyz\/embed\/movie\/{tmdb}",
   "tmdb_api_key": "",
   "notice": "",
-  "dark_default": true
+  "dark_default": true,
+  "request_whatsapp": "",
+  "request_telegram": "",
+  "theme": "ocean"
 }
