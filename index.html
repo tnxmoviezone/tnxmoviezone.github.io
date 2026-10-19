@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TNxMovieZone — Watch Movies & Shows</title>
 <meta name="description" content="TNxMovieZone — stream movies and shows in HD.">
-<link rel="stylesheet" href="css/style.css?v=13">
+<link rel="stylesheet" href="css/style.css?v=14">
 <link rel="icon" href="logo/logo.png" type="image/png">
 </head>
 <body>
@@ -77,6 +77,19 @@
   <div class="chips" id="catChips"></div>
   <!-- Language filter chips -->
   <div class="chips" id="langChips" style="margin-top:8px;"></div>
+  <!-- Year / Rating filters -->
+  <div class="chips" id="advFilters" style="margin-top:8px;align-items:center;">
+    <span style="font-size:.75rem;color:var(--text-faint);margin-right:4px;">🔍</span>
+    <select id="yearFilter" class="chip" style="appearance:auto;padding:8px 12px;cursor:pointer;">
+      <option value="All">📅 All Years</option>
+    </select>
+    <select id="ratingFilter" class="chip" style="appearance:auto;padding:8px 12px;cursor:pointer;">
+      <option value="0">⭐ Any Rating</option>
+      <option value="7">⭐ 7+</option>
+      <option value="8">⭐ 8+</option>
+      <option value="9">⭐ 9+</option>
+    </select>
+  </div>
 
   <!-- Full-screen search results -->
   <section class="row-sec" id="searchSec" style="display:none;">
@@ -131,7 +144,7 @@
   </div>
 </footer>
 
-<script src="js/app.js?v=3"></script>
+<script src="js/app.js?v=4"></script>
 <script>
 /* source protection */
 (function(){
