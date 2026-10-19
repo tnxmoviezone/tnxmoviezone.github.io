@@ -148,6 +148,101 @@
     if (!auto) toast('Switched to ' + servers[i].name);
   }
 
+  /* ---------- episodes ---------- */
+  var episodes = [];      // [{n, title, url}]
+  var activeEp = 0;
+  function isWebSeries() {
+    if (episodes.length) return true;
+    var ct = movie && movie.content_type ? String(movie.content_type).toLowerCase() : '';
+    if (ct.indexOf('web') > -1 || ct.indexOf('series') > -1 || ct === 'anime' || ct === 'tv') return true;
+    var ep = movie && movie.episodes ? String(movie.episodes).trim() : '';
+    return ep !== '' && ep !== '0';
+  }
+  function buildEpisodes() {
+    episodes = [];
+    var list = movie.episode_list || [];
+    for (var i = 0; i < list.length; i++) {
+      var e = list[i];
+      if (e && e.url) episodes.push({ n: e.n || (i + 1), title: e.title || '', url: e.url });
+    }
+    episodes.sort(function (a, b) { return a.n - b.n; });
+    // fallback: episode count without URLs → buttons use default servers
+    if (!episodes.length && isWebSeries()) {
+      var cnt = parseInt(String(movie.episodes || '').replace(/\D/g, ''), 10) || 0;
+      if (cnt > 0 && cnt <= 200) {
+        for (var j = 1; j <= cnt; j++) episodes.push({ n: j, title: '', url: '' });
+      }
+    }
+  }
+  function renderEpisodes() {
+    var sec = document.getElementById('epSec');
+    var grid = document.getElementById('epGrid');
+    var nextBtn = document.getElementById('nextEpBtn');
+    if (!sec || !grid) return;
+    if (!episodes.length) { sec.style.display = 'none'; return; }
+    sec.style.display = '';
+    grid.innerHTML = '';
+    episodes.forEach(function (ep, i) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'ep-btn' + (i === activeEp ? ' on' : '');
+      b.textContent = ep.title ? (ep.n + '. ' + ep.title) : ('EP ' + ep.n);
+      b.title = ep.title || ('Episode ' + ep.n);
+      b.onclick = function () { playEpisode(i, false); };
+      grid.appendChild(b);
+    });
+    updateNextBtn();
+  }
+  function updateNextBtn() {
+    var nextBtn = document.getElementById('nextEpBtn');
+    if (!nextBtn) return;
+    if (activeEp + 1 < episodes.length) {
+      nextBtn.style.display = '';
+      nextBtn.onclick = function () { playEpisode(activeEp + 1, false); };
+    } else {
+      nextBtn.style.display = 'none';
+    }
+  }
+  function playEpisode(i, auto) {
+    if (i < 0 || i >= episodes.length) return;
+    activeEp = i;
+    var ep = episodes[i];
+    renderEpisodes();
+    // save progress
+    try {
+      var prog = JSON.parse(localStorage.getItem('vf_ep_progress') || '{}');
+      prog[movie.id] = ep.n;
+      localStorage.setItem('vf_ep_progress', JSON.stringify(prog));
+    } catch (e) {}
+    if (ep.url) {
+      // per-episode URL → play directly
+      servers = [{ name: 'EP ' + ep.n, url: ep.url, type: 'embed' }];
+      activeIdx = 0;
+      renderServerBtns();
+      loadServer(0);
+      document.getElementById('wTitle').textContent =
+        movie.title + ' — EP ' + ep.n + (ep.title ? (': ' + ep.title) : '');
+    } else {
+      // no per-episode URL → default servers
+      buildServers();
+      activeIdx = 0;
+      renderServerBtns();
+      loadServer(0);
+    }
+    if (!auto) {
+      toast('Playing Episode ' + ep.n);
+      // update URL for shareable link
+      try {
+        var u = new URL(location.href);
+        u.searchParams.set('ep', ep.n);
+        history.replaceState(null, '', u.toString());
+      } catch (e) {}
+    }
+    // scroll player into view on mobile
+    var frame = document.getElementById('playerFrame');
+    if (frame && !auto) frame.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
   /* ---------- boot ---------- */
   function boot() {
     initTheme();
@@ -202,12 +297,36 @@
       buildServers();
       renderServerBtns();
       saveContinueWatching();
-      if (servers.length) loadServer(0);
-      else {
-        var loading = document.getElementById('playerLoading');
-        if (loading) {
-          loading.style.display = 'grid';
-          loading.innerHTML = '<div style="text-align:center;padding:20px">No servers available for this title yet.</div>';
+      /* episodes */
+      buildEpisodes();
+      var epParam = parseInt(qs('ep') || '0', 10) || 0;
+      var startEp = -1;
+      if (epParam > 0) {
+        for (var ei = 0; ei < episodes.length; ei++) {
+          if (episodes[ei].n === epParam) { startEp = ei; break; }
+        }
+      }
+      if (startEp === -1 && episodes.length) {
+        try {
+          var prog = JSON.parse(localStorage.getItem('vf_ep_progress') || '{}');
+          var lastN = prog[movie.id] || 0;
+          for (var pi = 0; pi < episodes.length; pi++) {
+            if (episodes[pi].n === lastN) { startEp = pi; break; }
+          }
+        } catch (e) {}
+      }
+      if (startEp >= 0) {
+        renderEpisodes();
+        playEpisode(startEp, true);
+      } else {
+        renderEpisodes();
+        if (servers.length) loadServer(0);
+        else {
+          var loading = document.getElementById('playerLoading');
+          if (loading) {
+            loading.style.display = 'grid';
+            loading.innerHTML = '<div style="text-align:center;padding:20px">No servers available for this title yet.</div>';
+          }
         }
       }
     });
