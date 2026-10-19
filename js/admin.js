@@ -544,6 +544,7 @@ function openMovieModal(id) {
   $('mAge').value = m ? (m.age_rating || '') : '';
   $('mFeatured').checked = !!(m && m.is_featured);
   $('mTrending').checked = !!(m && m.is_trending);
+  $('mIsNew').checked = !m || m.is_new !== false;
   $('mListed').checked = !m || m.listed !== false;
   $('mDeleteBtn').style.display = m ? '' : 'none';
   $('tmdbSearch').value = m ? (m.title || '') : '';
@@ -567,9 +568,17 @@ function collectMovie() {
   var servers = getServers();
   var video_url = servers.length ? servers[0].url : '';
   var extraServers = servers.slice(1);
+  // preserve added_at on edit; set on new
+  var existing = null;
+  for (var i = 0; i < movies.length; i++) {
+    if (String(movies[i].id) === String($('mId').value)) { existing = movies[i]; break; }
+  }
+  var addedAt = existing && existing.added_at ? existing.added_at : Date.now();
   return {
     id: id,
     title: title,
+    added_at: addedAt,
+    is_new: $('mIsNew') ? $('mIsNew').checked : false,
     content_type: getSelectedType(),
     year: $('mYear').value.trim(),
     release_date: $('mReleaseDate').value,
