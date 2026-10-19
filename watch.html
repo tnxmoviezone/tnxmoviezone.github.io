@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Watch — TNxMovieZone</title>
-<link rel="stylesheet" href="css/style.css?v=11">
+<link rel="stylesheet" href="css/style.css?v=12">
 <link rel="icon" href="logo/logo.png" type="image/png">
 </head>
 <body>
@@ -37,6 +37,14 @@
       </div>
     </div>
 
+    <div id="epSec" style="display:none;margin-top:20px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
+        <h3 class="row-title" style="font-size:1.1rem;margin:0;">📺 Episodes</h3>
+        <button type="button" class="btn btn-grad btn-sm" id="nextEpBtn" style="display:none;">Next Episode →</button>
+      </div>
+      <div id="epGrid" style="display:flex;gap:8px;flex-wrap:wrap;max-height:220px;overflow-y:auto;padding:4px;"></div>
+    </div>
+
     <div style="display:flex;gap:12px;margin-top:18px;flex-wrap:wrap;">
       <a class="btn btn-ghost btn-sm" id="wBack" href="index.html">← Back</a>
       <a class="btn btn-ghost btn-sm" id="wDetails" href="#">Movie Details</a>
@@ -58,7 +66,7 @@
   </div>
 </footer>
 
-<script src="js/watch.js?v=2"></script>
+<script src="js/watch.js?v=3"></script>
 <script>
 /* source protection */
 (function(){
