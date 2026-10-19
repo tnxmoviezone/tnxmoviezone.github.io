@@ -825,3 +825,21 @@ img { image-rendering: -webkit-optimize-contrast; }
   .card::after { display: none; }
   .ripple { display: none; }
 }
+
+/* --- episode selector --- */
+.ep-btn {
+  min-width: 52px; padding: 10px 14px;
+  border-radius: 12px; border: 1px solid var(--glass-border);
+  background: var(--glass); color: var(--text);
+  font-size: .85rem; font-weight: 700; cursor: pointer;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 var(--glass-highlight), 0 3px 0 var(--depth);
+  transition: var(--transition);
+  white-space: nowrap; max-width: 200px; overflow: hidden; text-overflow: ellipsis;
+}
+.ep-btn:hover { border-color: var(--purple); transform: translateY(-2px); }
+.ep-btn:active { transform: translateY(2px); box-shadow: inset 0 1px 0 var(--glass-highlight), 0 1px 0 var(--depth); }
+.ep-btn.on {
+  background: var(--grad); color: #fff; border-color: transparent;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 4px 0 #5b21b6, 0 8px 20px rgba(139,92,246,.4);
+}
