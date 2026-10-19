@@ -4,10 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Movie — TNxMovieZone</title>
-<link rel="stylesheet" href="css/style.css?v=10">
+<link rel="stylesheet" href="css/style.css?v=11">
 <link rel="icon" href="logo/logo.png" type="image/png">
 </head>
 <body>
+<div class="aurora-bg" aria-hidden="true"><span></span><span></span><span></span></div>
 
 <header class="header">
   <div class="wrap header-inner">
@@ -86,6 +87,44 @@
       e.preventDefault();
     }
   });
+})();
+</script>
+<script>
+/* 3D tilt + ripple effects (2026-10-19) */
+(function(){
+  var fine = window.matchMedia('(pointer:fine)').matches;
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (fine && !reduced) {
+    document.addEventListener('mousemove', function(e){
+      var card = e.target.closest ? e.target.closest('.card') : null;
+      document.querySelectorAll('.card.tilting').forEach(function(c){
+        if (c !== card) { c.style.transform=''; c.classList.remove('tilting'); }
+      });
+      if (!card) return;
+      var r = card.getBoundingClientRect();
+      var x = (e.clientX - r.left)/r.width - .5, y = (e.clientY - r.top)/r.height - .5;
+      card.classList.add('tilting');
+      card.style.transform = 'perspective(800px) rotateX('+(-y*10).toFixed(1)+'deg) rotateY('+(x*12).toFixed(1)+'deg) translateY(-4px)';
+    });
+    document.addEventListener('mouseout', function(e){
+      var card = e.target.closest ? e.target.closest('.card') : null;
+      if (card && !card.contains(e.relatedTarget)) { card.style.transform=''; card.classList.remove('tilting'); }
+    });
+  }
+  if (!reduced) {
+    document.addEventListener('click', function(e){
+      var btn = e.target.closest ? e.target.closest('.btn') : null;
+      if (!btn) return;
+      var r = btn.getBoundingClientRect(), d = Math.max(r.width, r.height);
+      var s = document.createElement('span');
+      s.className='ripple';
+      s.style.width = s.style.height = d+'px';
+      s.style.left = (e.clientX - r.left - d/2)+'px';
+      s.style.top = (e.clientY - r.top - d/2)+'px';
+      btn.appendChild(s);
+      setTimeout(function(){ s.remove(); }, 650);
+    });
+  }
 })();
 </script>
 </body>
