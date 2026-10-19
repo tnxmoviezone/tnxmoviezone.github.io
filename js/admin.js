@@ -470,10 +470,61 @@ function openMovieModal(id) {
     var btn = document.getElementById('addServerBtn');
     if (btn) btn.onclick = function () { addServerRow('', ''); };
   }
+  /* ---------- episodes ---------- */
+  window._episodeRows = [];
+  function getEpisodes() {
+    var out = [];
+    (window._episodeRows || []).forEach(function (row) {
+      var nEl = row.querySelector('[data-ep="n"]');
+      var tEl = row.querySelector('[data-ep="title"]');
+      var uEl = row.querySelector('[data-ep="url"]');
+      var n = parseInt(nEl ? nEl.value : '0', 10) || 0;
+      var url = extractEmbedUrl(uEl ? uEl.value : '');
+      if (n > 0 && url) out.push({ n: n, title: tEl ? tEl.value.trim() : '', url: url });
+    });
+    out.sort(function (a, b) { return a.n - b.n; });
+    return out;
+  }
+  function addEpisodeRow(n, title, url) {
+    var list = document.getElementById('episodeList');
+    if (!list) return;
+    var idx = window._episodeRows.length;
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;align-items:center;';
+    row.innerHTML =
+      '<input type="number" min="1" placeholder="EP#" value="' + (n || '') + '" data-ep="n" style="flex:0 0 64px;">' +
+      '<input type="text" placeholder="Episode title (optional)" value="' + escAttr(title || '') + '" data-ep="title" style="flex:0 0 140px;">' +
+      '<input type="text" placeholder="https://... or <iframe>" value="' + escAttr(url || '') + '" data-ep="url" style="flex:1;">' +
+      '<button type="button" class="btn btn-ghost btn-sm" data-ep="del" style="flex:none;">✕</button>';
+    list.appendChild(row);
+    window._episodeRows.push(row);
+    if (!n) {
+      var maxN = 0;
+      window._episodeRows.forEach(function (r) {
+        var v = parseInt(r.querySelector('[data-ep="n"]').value, 10) || 0;
+        if (v > maxN) maxN = v;
+      });
+      row.querySelector('[data-ep="n"]').value = maxN + 1;
+    }
+    row.querySelector('[data-ep="del"]').onclick = function () {
+      row.remove();
+      window._episodeRows = window._episodeRows.filter(function (r) { return r !== row; });
+    };
+  }
+  function setEpisodes(list) {
+    var box = document.getElementById('episodeList');
+    if (box) box.innerHTML = '';
+    window._episodeRows = [];
+    (list || []).forEach(function (e) { addEpisodeRow(e.n, e.title, e.url); });
+  }
+  function bindAddEpisodeBtn() {
+    var btn = document.getElementById('addEpisodeBtn');
+    if (btn) btn.onclick = function () { addEpisodeRow(0, '', ''); };
+  }
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', bindAddServerBtn);
+    document.addEventListener('DOMContentLoaded', function () { bindAddServerBtn(); bindAddEpisodeBtn(); });
   } else {
-    bindAddServerBtn();
+    bindAddServerBtn(); bindAddEpisodeBtn();
   }
   $('mPoster').value = m ? (m.poster_url || '') : '';
   $('mBackdrop').value = m ? (m.backdrop_url || '') : '';
@@ -489,6 +540,7 @@ function openMovieModal(id) {
   $('mTrailer').value = m ? (m.trailer_url || '') : '';
   $('mQuality').value = m ? (m.quality || '') : '';
   $('mEpisodes').value = m ? (m.episodes || '') : '';
+  setEpisodes(m ? m.episode_list : null);
   $('mAge').value = m ? (m.age_rating || '') : '';
   $('mFeatured').checked = !!(m && m.is_featured);
   $('mTrending').checked = !!(m && m.is_trending);
@@ -540,6 +592,7 @@ function collectMovie() {
     trailer_url: $('mTrailer').value.trim(),
     quality: $('mQuality').value,
     episodes: $('mEpisodes').value.trim(),
+    episode_list: getEpisodes(),
     age_rating: $('mAge').value,
     is_featured: $('mFeatured').checked,
     is_trending: $('mTrending').checked,
