@@ -107,6 +107,7 @@
       el.style.height = '100%';
       el.addEventListener('error', function () { onServerError(i); }, true);
       el.addEventListener('canplay', function () { if (loading) loading.style.display = 'none'; });
+      el.addEventListener('ended', function () { onVideoEnded(); });
     } else {
       el = document.createElement('iframe');
       el.src = s.url;
@@ -182,6 +183,15 @@
     if (!episodes.length) { sec.style.display = 'none'; return; }
     sec.style.display = '';
     grid.innerHTML = '';
+    var tgl = document.getElementById('autoNextToggle');
+    if (tgl && !tgl._bound) {
+      tgl._bound = true;
+      tgl.checked = isAutoNextOn();
+      tgl.onchange = function () {
+        try { localStorage.setItem('vf_autonext', tgl.checked ? 'on' : 'off'); } catch (e) {}
+        toast(tgl.checked ? 'Auto-next ON' : 'Auto-next OFF');
+      };
+    }
     episodes.forEach(function (ep, i) {
       var b = document.createElement('button');
       b.type = 'button';
@@ -205,6 +215,7 @@
   }
   function playEpisode(i, auto) {
     if (i < 0 || i >= episodes.length) return;
+    hideAutoNextOverlay();
     activeEp = i;
     var ep = episodes[i];
     renderEpisodes();
@@ -342,6 +353,55 @@
       list = list.slice(0, 20);
       localStorage.setItem(key, JSON.stringify(list));
     } catch (e) {}
+  }
+
+  /* ---------- auto-next episode ---------- */
+  var autoNextTimer = null;
+  var autoNextCount = 0;
+  function isAutoNextOn() {
+    try { return localStorage.getItem('vf_autonext') !== 'off'; }
+    catch (e) { return true; }
+  }
+  function onVideoEnded() {
+    // only for direct videos; embeds can't fire 'ended'
+    if (!isAutoNextOn()) return;
+    if (activeEp + 1 >= episodes.length) return;
+    var next = episodes[activeEp + 1];
+    showAutoNextOverlay(next);
+  }
+  function showAutoNextOverlay(next) {
+    hideAutoNextOverlay();
+    autoNextCount = 5;
+    var ov = document.createElement('div');
+    ov.id = 'autoNextOv';
+    ov.style.cssText = 'position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);border-radius:16px;text-align:center;padding:20px;';
+    ov.innerHTML =
+      '<div style="font-size:1.05rem;font-weight:800;">Up Next</div>' +
+      '<div style="font-size:1.3rem;font-weight:800;color:var(--purple);">EP ' + next.n + (next.title ? ': ' + esc(next.title) : '') + '</div>' +
+      '<div id="autoNextCount" style="font-size:2.2rem;font-weight:800;">5</div>' +
+      '<div style="display:flex;gap:10px;">' +
+      '<button type="button" class="btn btn-grad btn-sm" id="autoNextPlay">▶ Play Now</button>' +
+      '<button type="button" class="btn btn-ghost btn-sm" id="autoNextCancel">Cancel</button>' +
+      '</div>';
+    var frame = document.getElementById('playerFrame');
+    if (frame) { frame.style.position = 'relative'; frame.appendChild(ov); }
+    document.getElementById('autoNextPlay').onclick = function () {
+      hideAutoNextOverlay(); playEpisode(activeEp + 1, false);
+    };
+    document.getElementById('autoNextCancel').onclick = function () { hideAutoNextOverlay(); };
+    autoNextTimer = setInterval(function () {
+      autoNextCount--;
+      var c = document.getElementById('autoNextCount');
+      if (c) c.textContent = autoNextCount;
+      if (autoNextCount <= 0) {
+        hideAutoNextOverlay(); playEpisode(activeEp + 1, false);
+      }
+    }, 1000);
+  }
+  function hideAutoNextOverlay() {
+    if (autoNextTimer) { clearInterval(autoNextTimer); autoNextTimer = null; }
+    var ov = document.getElementById('autoNextOv');
+    if (ov) ov.remove();
   }
 
   /* ---------- report broken link ---------- */
