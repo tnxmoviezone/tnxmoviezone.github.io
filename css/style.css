@@ -20,6 +20,7 @@
   --glass: rgba(255,255,255,.07);
   --glass-border: rgba(255,255,255,.14);
   --glass-highlight: rgba(255,255,255,.16);
+  --depth: rgba(0,0,0,.25);
   --card: rgba(18,18,42,.72);
   --danger: #f43f5e;
   --success: #10b981;
@@ -37,8 +38,10 @@
   --text-dim: #55557a;
   --text-faint: #9a9ab5;
   --glass: rgba(255,255,255,.65);
-  --glass-border: rgba(20,20,60,.10);
-  --card: rgba(255,255,255,.85);
+  --glass-border: rgba(20,20,60,.12);
+  --glass-highlight: rgba(255,255,255,.9);
+  --card: rgba(255,255,255,.8);
+  --depth: rgba(20,20,60,.16);
   --shadow: 0 12px 40px rgba(80,70,160,.14);
 }
 
@@ -136,11 +139,11 @@ img { display: block; max-width: 100%; }
   font-size: 1.1rem;
   display: grid; place-items: center;
   backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  box-shadow: inset 0 1px 0 var(--glass-highlight), 0 3px 0 rgba(0,0,0,.25), 0 6px 14px rgba(0,0,0,.3);
+  box-shadow: inset 0 1px 0 var(--glass-highlight), 0 3px 0 var(--depth), 0 6px 14px rgba(0,0,0,.3);
   transition: var(--transition);
 }
 .icon-btn:hover { border-color: var(--purple); transform: translateY(-1px); }
-.icon-btn:active { transform: translateY(2px); box-shadow: inset 0 1px 0 var(--glass-highlight), 0 1px 0 rgba(0,0,0,.25); }
+.icon-btn:active { transform: translateY(2px); box-shadow: inset 0 1px 0 var(--glass-highlight), 0 1px 0 var(--depth); }
 
 /* ---------- Buttons ---------- */
 .btn {
@@ -162,10 +165,10 @@ img { display: block; max-width: 100%; }
   background: var(--glass); color: var(--text);
   border: 1px solid var(--glass-border);
   backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-  box-shadow: inset 0 1px 0 var(--glass-highlight), 0 4px 0 rgba(0,0,0,.25), 0 8px 20px rgba(0,0,0,.3);
+  box-shadow: inset 0 1px 0 var(--glass-highlight), 0 4px 0 var(--depth), 0 8px 20px rgba(0,0,0,.3);
 }
-.btn-ghost:hover { border-color: var(--purple); transform: translateY(-2px); box-shadow: inset 0 1px 0 var(--glass-highlight), 0 6px 0 rgba(0,0,0,.25), 0 12px 24px rgba(0,0,0,.35); }
-.btn-ghost:active { transform: translateY(3px); box-shadow: inset 0 1px 0 var(--glass-highlight), 0 1px 0 rgba(0,0,0,.25), 0 4px 10px rgba(0,0,0,.3); }
+.btn-ghost:hover { border-color: var(--purple); transform: translateY(-2px); box-shadow: inset 0 1px 0 var(--glass-highlight), 0 6px 0 var(--depth), 0 12px 24px rgba(0,0,0,.35); }
+.btn-ghost:active { transform: translateY(3px); box-shadow: inset 0 1px 0 var(--glass-highlight), 0 1px 0 var(--depth), 0 4px 10px rgba(0,0,0,.3); }
 .btn-danger { background: rgba(244,63,94,.14); color: var(--danger); border: 1px solid rgba(244,63,94,.35); }
 .btn-danger:hover { background: rgba(244,63,94,.25); }
 .btn-sm { padding: 8px 16px; font-size: .82rem; border-radius: 10px; }
