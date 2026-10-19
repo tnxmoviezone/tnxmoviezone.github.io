@@ -5,6 +5,24 @@
    ============================================================ */
 'use strict';
 
+/* ---------- theme (shared with site) ---------- */
+(function initTheme() {
+  var t = localStorage.getItem('vf_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  document.addEventListener('DOMContentLoaded', function () {
+    var btn = document.getElementById('themeToggle');
+    if (btn) {
+      btn.textContent = t === 'dark' ? '🌙' : '☀️';
+      btn.onclick = function () {
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('vf_theme', next);
+        btn.textContent = next === 'dark' ? '🌙' : '☀️';
+      };
+    }
+  });
+})();
+
 /* ---------- state ---------- */
 var gh = null;              // {token, owner, repo, branch}
 var movies = [];
