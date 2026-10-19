@@ -77,9 +77,15 @@
     row.innerHTML = items.map(cardHTML).join('');
   }
 
+  function isNew(m) {
+    if (m.is_new) return true;
+    if (!m.added_at) return false;
+    return (Date.now() - m.added_at) < 7 * 24 * 60 * 60 * 1000;
+  }
   function cardHTML(m, i) {
     var badge = '';
-    if (m.is_trending) badge = '<span class="card-badge">🔥 Trending</span>';
+    if (isNew(m)) badge = '<span class="n-badge">NEW</span>';
+    else if (m.is_trending) badge = '<span class="card-badge">🔥 Trending</span>';
     else if (m.is_featured) badge = '<span class="card-badge">✨ Featured</span>';
     var qbadge = m.quality ? '<span class="q-badge">' + esc(m.quality) + '</span>' : '';
     var abadge = m.age_rating ? '<span class="a-badge">' + esc(m.age_rating) + '</span>' : '';
