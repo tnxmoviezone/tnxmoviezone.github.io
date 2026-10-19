@@ -8,6 +8,8 @@
   var heroTimer = null;
   var activeCat = 'All';
   var activeLang = 'All';
+  var activeYear = 'All';
+  var minRating = 0;
 
   /* ---------- theme ---------- */
   function initTheme() {
@@ -225,6 +227,32 @@
     }
   }
 
+  function renderYearFilter() {
+    var sel = document.getElementById('yearFilter');
+    if (!sel) return;
+    var yearSet = {};
+    movies.filter(listed).forEach(function (m) {
+      var y = String(m.year || '').trim();
+      if (y) yearSet[y] = true;
+    });
+    var years = Object.keys(yearSet).sort().reverse();
+    var cur = sel.value || 'All';
+    sel.innerHTML = '<option value="All">📅 All Years</option>' + years.map(function (y) {
+      return '<option value="' + esc(y) + '"' + (y === cur ? ' selected' : '') + '>' + esc(y) + '</option>';
+    }).join('');
+    sel.value = cur;
+    if (!sel._bound) {
+      sel._bound = true;
+      sel.onchange = function () { activeYear = sel.value; applyFilter(); };
+    }
+  }
+  function bindRatingFilter() {
+    var sel = document.getElementById('ratingFilter');
+    if (!sel || sel._bound) return;
+    sel._bound = true;
+    sel.onchange = function () { minRating = parseFloat(sel.value) || 0; applyFilter(); };
+  }
+
   function renderContinueWatching() {
     var sec = document.getElementById('continueSec');
     var row = document.getElementById('continueRow');
@@ -253,6 +281,18 @@
     if (activeLang !== 'All') {
       vis = vis.filter(function (m) {
         return (m.language || '').toLowerCase().split(',').map(function (s) { return s.trim(); }).indexOf(activeLang.toLowerCase()) > -1;
+      });
+    }
+    /* year filter */
+    if (activeYear !== 'All') {
+      vis = vis.filter(function (m) {
+        return String(m.year || '').trim() === activeYear;
+      });
+    }
+    /* rating filter */
+    if (minRating > 0) {
+      vis = vis.filter(function (m) {
+        return parseFloat(m.rating || '0') >= minRating;
       });
     }
     var trending = vis.filter(function (m) { return m.is_trending; });
@@ -487,6 +527,8 @@
       applySettings();
       renderCatChips();
       renderLangChips();
+      renderYearFilter();
+      bindRatingFilter();
       renderContinueWatching();
       renderWatchlistRow();
       var featured = movies.filter(listed).filter(function (m) { return m.is_featured; });
