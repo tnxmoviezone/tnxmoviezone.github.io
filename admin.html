@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin — TNxMovieZone</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="stylesheet" href="css/style.css?v=12">
+<link rel="stylesheet" href="css/style.css?v=13">
 <link rel="icon" href="logo/logo.png" type="image/png">
 </head>
 <body>
@@ -176,6 +176,7 @@
     <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:6px;">
       <label class="toggle-row"><input type="checkbox" id="mFeatured" class="toggle-input"><span class="toggle-sw"></span> Featured</label>
       <label class="toggle-row"><input type="checkbox" id="mTrending" class="toggle-input"><span class="toggle-sw"></span> Trending</label>
+      <label class="toggle-row"><input type="checkbox" id="mIsNew" class="toggle-input" checked><span class="toggle-sw"></span> 🆕 NEW badge</label>
       <label class="toggle-row"><input type="checkbox" id="mListed" class="toggle-input" checked><span class="toggle-sw"></span> Listed <small style="color:var(--text-faint)">(visible on site)</small></label>
     </div>
     <div class="modal-actions">
@@ -188,7 +189,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="js/admin.js?v=8"></script>
+<script src="js/admin.js?v=9"></script>
 <script>
 /* 3D tilt + ripple effects (2026-10-19) */
 (function(){
