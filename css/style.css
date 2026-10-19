@@ -448,7 +448,7 @@ tr:hover td { background: rgba(139,92,246,.05); }
 .toggle-input:checked + .toggle-sw.toggle-sm::after { left:18px; }
 
 .detail-poster-col { display:flex; flex-direction:column; gap:12px; flex:none; }
-.detail-top-row { display:flex; gap:20px; align-items:flex-start; }
+.detail-top-row { display:flex; gap:20px; align-items:flex-start; min-width:0; }
 .detail-side-extra { flex:1; min-width:0; padding-top:4px; }
 .detail-side-extra .detail-extra { grid-template-columns:1fr; margin-bottom:0; }
 .detail-hero { position:relative; }
