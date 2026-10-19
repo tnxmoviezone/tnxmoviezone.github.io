@@ -135,9 +135,12 @@ img { display: block; max-width: 100%; }
   color: var(--text);
   font-size: 1.1rem;
   display: grid; place-items: center;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 var(--glass-highlight), 0 3px 0 rgba(0,0,0,.25), 0 6px 14px rgba(0,0,0,.3);
   transition: var(--transition);
 }
 .icon-btn:hover { border-color: var(--purple); transform: translateY(-1px); }
+.icon-btn:active { transform: translateY(2px); box-shadow: inset 0 1px 0 var(--glass-highlight), 0 1px 0 rgba(0,0,0,.25); }
 
 /* ---------- Buttons ---------- */
 .btn {
@@ -147,10 +150,22 @@ img { display: block; max-width: 100%; }
   font-size: .95rem; font-weight: 700;
   transition: var(--transition);
 }
-.btn-grad { background: var(--grad); color: #fff; box-shadow: 0 8px 24px rgba(139,92,246,.35); }
-.btn-grad:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(139,92,246,.5); }
-.btn-ghost { background: var(--glass); color: var(--text); border: 1px solid var(--glass-border); backdrop-filter: blur(16px); }
-.btn-ghost:hover { border-color: var(--purple); }
+.btn-grad {
+  background: linear-gradient(180deg, #a78bfa 0%, #8b5cf6 45%, #7c3aed 100%);
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,.3);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35), inset 0 -2px 0 rgba(0,0,0,.2), 0 6px 0 #5b21b6, 0 10px 24px rgba(0,0,0,.4);
+}
+.btn-grad:hover { transform: translateY(-2px); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), inset 0 -2px 0 rgba(0,0,0,.2), 0 8px 0 #5b21b6, 0 14px 32px rgba(139,92,246,.45); }
+.btn-grad:active { transform: translateY(4px); box-shadow: inset 0 1px 0 rgba(255,255,255,.25), inset 0 -1px 0 rgba(0,0,0,.2), 0 2px 0 #5b21b6, 0 4px 12px rgba(0,0,0,.4); }
+.btn-ghost {
+  background: var(--glass); color: var(--text);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  box-shadow: inset 0 1px 0 var(--glass-highlight), 0 4px 0 rgba(0,0,0,.25), 0 8px 20px rgba(0,0,0,.3);
+}
+.btn-ghost:hover { border-color: var(--purple); transform: translateY(-2px); box-shadow: inset 0 1px 0 var(--glass-highlight), 0 6px 0 rgba(0,0,0,.25), 0 12px 24px rgba(0,0,0,.35); }
+.btn-ghost:active { transform: translateY(3px); box-shadow: inset 0 1px 0 var(--glass-highlight), 0 1px 0 rgba(0,0,0,.25), 0 4px 10px rgba(0,0,0,.3); }
 .btn-danger { background: rgba(244,63,94,.14); color: var(--danger); border: 1px solid rgba(244,63,94,.35); }
 .btn-danger:hover { background: rgba(244,63,94,.25); }
 .btn-sm { padding: 8px 16px; font-size: .82rem; border-radius: 10px; }
