@@ -843,3 +843,18 @@ img { image-rendering: -webkit-optimize-contrast; }
   background: var(--grad); color: #fff; border-color: transparent;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 4px 0 #5b21b6, 0 8px 20px rgba(139,92,246,.4);
 }
+
+/* --- NEW badge --- */
+.n-badge {
+  position: absolute; top: 8px; left: 8px; z-index: 3;
+  background: linear-gradient(135deg, #10b981, #06b6d4);
+  color: #fff; font-size: 10px; font-weight: 800;
+  padding: 3px 10px; border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(16,185,129,.5);
+  animation: newPulse 2s ease-in-out infinite;
+}
+@keyframes newPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+@media (prefers-reduced-motion: reduce) { .n-badge { animation: none; } }
