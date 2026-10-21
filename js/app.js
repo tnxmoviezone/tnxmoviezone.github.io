@@ -47,6 +47,8 @@
     return String(url).replace('image.tmdb.org/t/p/original/', 'image.tmdb.org/t/p/' + size + '/');
   }
 
+  function T(s) { return window.tr ? window.tr(s) : s; }
+
   /* ---------- toast (was called but never defined — fixed) ---------- */
   var toastTimer = null;
   function toast(msg, ms) {
@@ -133,6 +135,7 @@
     else if (m.is_featured) badge = '<span class="card-badge">✨ Featured</span>';
     var qbadge = m.quality ? '<span class="q-badge">' + esc(m.quality) + '</span>' : '';
     var abadge = m.age_rating ? '<span class="a-badge">' + esc(m.age_rating) + '</span>' : '';
+    var dubbadge = m.audio ? '<span class="dub-badge">🎧 ' + esc(m.audio) + '</span>' : (m.subtitle ? '<span class="dub-badge">💬 ' + esc(m.subtitle) + '</span>' : '');
     var wbtn = '<button type="button" class="wl-btn' + (isInWatchlist(m.id) ? ' on' : '') + '" data-wl="' + esc(String(m.id)) + '" onclick="toggleWatchlist(\'' + String(m.id).replace(/'/g, "\\'") + '\',event)" title="Watchlist">' + (isInWatchlist(m.id) ? '❤️' : '🤍') + '</button>';
     var rating = m.rating ? '<span class="imdb">★ ' + esc(m.rating) + '</span>' : '';
     return '<a class="card" href="movie.html?id=' + encodeURIComponent(m.id) + '" style="animation-delay:' + (i * 40) + 'ms">' +
@@ -145,7 +148,7 @@
       '<div class="card-play"><span>▶</span></div>' +
       '</div>' +
       '<div class="card-info"><div class="card-title">' + esc(m.title) + '</div>' +
-      '<div class="card-sub"><span>' + esc(m.year || '') + '</span>' + rating + '</div></div></a>';
+      '<div class="card-sub"><span>' + esc(m.year || '') + '</span>' + rating + dubbadge + '</div></div></a>';
   }
 
   /* ---------- hero ---------- */
@@ -215,7 +218,7 @@
   function renderRow(elId, list) {
     var el = document.getElementById(elId);
     if (!el) return;
-    if (!list.length) { el.innerHTML = '<div class="empty">No titles here yet.</div>'; return; }
+    if (!list.length) { el.innerHTML = '<div class="empty">' + T('No titles here yet.') + '</div>'; return; }
     el.innerHTML = list.map(cardHTML).join('');
   }
 
@@ -393,14 +396,14 @@
       document.getElementById('latest').style.display = '';
       document.getElementById('trending').style.display = 'none';
       var lt = document.querySelector('#latest .row-title');
-      if (lt) lt.textContent = { newest: 'Newest First', rating: 'Top Rated', az: 'A – Z' }[activeSort] || 'Latest Release';
+      if (lt) lt.textContent = { newest: T('Newest First'), rating: T('Top Rated'), az: 'A – Z' }[activeSort] || T('Latest Release');
       renderRow('latestRow', sortList(vis).slice(0, 20));
       renderCatRows([]);
     } else {
       document.getElementById('latest').style.display = '';
       document.getElementById('trending').style.display = '';
       var lt2 = document.querySelector('#latest .row-title');
-      if (lt2) lt2.textContent = 'Latest Release';
+      if (lt2) lt2.textContent = T('Latest Release');
       renderRow('trendingRow', trending.length ? trending : vis.slice(0, 20));
       renderRow('latestRow', latest);
       renderCatRows(sortList(vis));
@@ -711,6 +714,7 @@
     document.getElementById('year').textContent = new Date().getFullYear();
     showSkeletons();
     initHoverCard();
+    window.addEventListener('langchange', function () { try { applyFilter(); } catch (e) {} });
     Promise.all([
       fetchJSON('data/movies.json').catch(function () { return []; }),
       fetchJSON('data/settings.json').catch(function () { return null; })
@@ -728,7 +732,7 @@
       var featured = movies.filter(listed).filter(function (m) { return m.is_featured; });
       var heroList = featured.length ? featured : movies.filter(listed).slice(0, 5);
       if (heroList.length) { setHero(heroList); restartHero(heroList); }
-      else { document.getElementById('heroTitle').textContent = 'No movies yet'; }
+      else { document.getElementById('heroTitle').textContent = T('No movies yet'); }
       applyFilter();
       var heroEl = document.getElementById('hero');
       if (heroEl) heroEl.classList.remove('skel-on');
@@ -745,7 +749,7 @@
     }).catch(function () {
       clearSkeletons();
       if (window.__hidePre) window.__hidePre();
-      document.getElementById('heroTitle').textContent = 'Failed to load catalog';
+      document.getElementById('heroTitle').textContent = T('Failed to load catalog');
     });
   }
 
