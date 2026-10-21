@@ -934,3 +934,8 @@ img { image-rendering: -webkit-optimize-contrast; }
   .pre-logo, .pre-bar span, .shimmer::after, .hero.skel-on::after { animation: none; }
   #hoverCard { transition: opacity .18s ease; }
 }
+
+/* --- Dub/Sub badge (card meta line) + lang toggle --- */
+.dub-badge { display: inline-block; margin-left: 6px; background: rgba(229,9,20,.14); color: #ff6b72; border: 1px solid rgba(229,9,20,.45); font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 999px; white-space: nowrap; }
+[data-theme="light"] .dub-badge { color: #c50812; background: rgba(229,9,20,.08); }
+.langToggle { font-family: 'Inter', sans-serif; }
