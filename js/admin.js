@@ -37,7 +37,7 @@ function esc(s) {
 }
 function toast(msg, ms) {
   var t = $('toast');
-  if (!t) return;
+  if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); }
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(function () { t.classList.remove('show'); }, ms || 3000);
