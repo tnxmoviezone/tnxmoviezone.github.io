@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=16">
+<link rel="stylesheet" href="css/style.css?v=17">
 <link rel="icon" href="logo/logo.png" type="image/png">
 </head>
 <body>
@@ -150,6 +150,8 @@
       <div class="field"><label>📂 Category <small style="color:var(--text-faint)">(TMDB theke auto-select hobe)</small></label><div id="catSelect" class="cat-select"></div><div style="display:flex;gap:8px;margin-top:8px;"><select id="catDropdown" style="flex:1;"><option value="">— Category select koro —</option></select><input type="text" id="newCatInput" placeholder="Notun category..." style="flex:1;"><button type="button" class="btn btn-ghost btn-sm" id="addCatBtn">+ Add</button></div></div>
       <div class="field"><label>Language</label><input type="text" id="mLang" placeholder="English, Hindi, Bengali…"></div>
       <div class="field"><label>Country</label><input type="text" id="mCountry" placeholder="USA, India, Bangladesh…"></div>
+      <div class="field"><label>🎧 Audio</label><input type="text" id="mAudio" placeholder="Original, Hindi Dubbed, Bangla Dubbed…" list="audioList"><datalist id="audioList"><option value="Original"></option><option value="Hindi Dubbed"></option><option value="Bangla Dubbed"></option><option value="English Dubbed"></option><option value="Multi Audio"></option></datalist></div>
+      <div class="field"><label>💬 Subtitle</label><input type="text" id="mSub" placeholder="English, Bangla, Hindi…" list="subList"><datalist id="subList"><option value="English"></option><option value="Bangla"></option><option value="Hindi"></option><option value="Multi Subs"></option><option value="None"></option></datalist></div>
       <div class="field"><label>TMDB ID</label><input type="text" id="mTmdb"></div>
       <div class="field"><label>Rating (e.g. 8.2)</label><input type="text" id="mRating"></div>
       <div class="field"><label>Duration</label><input type="text" id="mDuration" placeholder="2h 15m"></div>
@@ -192,7 +194,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="js/admin.js?v=10"></script>
+<script src="js/admin.js?v=11"></script>
 <script>
 /* 3D tilt + ripple effects (2026-10-19) */
 (function(){
