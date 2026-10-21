@@ -8,10 +8,19 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=15">
+<link rel="stylesheet" href="css/style.css?v=16">
 <link rel="icon" href="logo/logo.png" type="image/png">
 </head>
 <body>
+<div id="preloader" aria-hidden="true">
+  <div class="pre-logo">TNxMovieZone</div>
+  <div class="pre-bar"><span></span></div>
+</div>
+<script>
+window.__hidePre=function(){var p=document.getElementById('preloader');if(p){p.classList.add('done');setTimeout(function(){if(p.parentNode)p.parentNode.removeChild(p);},600);}};
+window.addEventListener('load',function(){setTimeout(window.__hidePre,350);});
+setTimeout(window.__hidePre,4000);
+</script>
 <div class="aurora-bg" aria-hidden="true"><span></span><span></span><span></span></div>
 
 <header class="header">
@@ -79,7 +88,7 @@
   </div>
 </footer>
 
-<script src="js/movie.js?v=2"></script>
+<script src="js/movie.js?v=3"></script>
 <script>
 /* source protection */
 (function(){
