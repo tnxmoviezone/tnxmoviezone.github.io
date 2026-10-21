@@ -597,7 +597,9 @@
   /* ---------- boot ---------- */
   /* ---------- hover-expand preview (desktop) ---------- */
   function initHoverCard() {
-    if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+    var finePointer = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+    var touchCapable = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+    if (!finePointer && !touchCapable) return;
     if (document.getElementById('hoverCard')) return;
     var hc = document.createElement('div');
     hc.id = 'hoverCard';
@@ -649,7 +651,7 @@
       open = true;
     }
     function hide() { hc.classList.remove('show'); open = false; currentCard = null; }
-    document.addEventListener('mouseover', function (e) {
+    if (finePointer) document.addEventListener('mouseover', function (e) {
       var card = e.target.closest ? e.target.closest('.card') : null;
       if (card && card !== currentCard) {
         currentCard = card;
@@ -657,7 +659,7 @@
         timer = setTimeout(function () { if (currentCard === card) show(card); }, 450);
       }
     });
-    document.addEventListener('mouseout', function (e) {
+    if (finePointer) document.addEventListener('mouseout', function (e) {
       var card = e.target.closest ? e.target.closest('.card') : null;
       if (card && card === currentCard && !card.contains(e.relatedTarget)) {
         if (timer) clearTimeout(timer);
@@ -668,6 +670,40 @@
     hc.addEventListener('mouseleave', hide);
     window.addEventListener('scroll', function () { if (timer) clearTimeout(timer); if (open) hide(); }, { passive: true, capture: true });
     window.addEventListener('resize', hide);
+
+    /* long-press preview (touch devices) */
+    if (touchCapable) {
+      var pressTimer = null, pressCard = null, suppressClick = false, startX = 0, startY = 0;
+      document.addEventListener('touchstart', function (e) {
+        var card = e.target.closest ? e.target.closest('.card') : null;
+        if (open && !hc.contains(e.target) && !card) { hide(); return; }
+        if (!card) return;
+        pressCard = card;
+        var t = e.touches[0]; startX = t.clientX; startY = t.clientY;
+        if (pressTimer) clearTimeout(pressTimer);
+        pressTimer = setTimeout(function () {
+          if (pressCard === card) {
+            show(card);
+            suppressClick = true;
+            if (navigator.vibrate) { try { navigator.vibrate(10); } catch (err) {} }
+          }
+        }, 550);
+      }, { passive: true });
+      document.addEventListener('touchmove', function (e) {
+        if (!pressTimer) return;
+        var t = e.touches[0];
+        if (Math.abs(t.clientX - startX) > 10 || Math.abs(t.clientY - startY) > 10) {
+          clearTimeout(pressTimer); pressTimer = null; pressCard = null;
+        }
+      }, { passive: true });
+      document.addEventListener('touchend', function () {
+        if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+        pressCard = null;
+      });
+      document.addEventListener('click', function (e) {
+        if (suppressClick) { suppressClick = false; e.preventDefault(); e.stopPropagation(); }
+      }, true);
+    }
   }
 
   function boot() {
