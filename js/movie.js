@@ -9,6 +9,11 @@
   function esc(s) {
     return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
+  /* TMDB originals are 1-2MB each; rewrite to the size actually displayed */
+  function timg(url, size) {
+    if (!url) return url;
+    return String(url).replace('image.tmdb.org/t/p/original/', 'image.tmdb.org/t/p/' + size + '/');
+  }
   function fetchJSON(url) {
     return fetch(url + (url.indexOf('?') > -1 ? '&' : '?') + 't=' + Date.now())
       .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
@@ -33,7 +38,7 @@
     var rating = m.rating ? '<span class="imdb">★ ' + esc(m.rating) + '</span>' : '';
     return '<a class="card" href="movie.html?id=' + encodeURIComponent(m.id) + '" style="animation-delay:' + (i * 40) + 'ms">' +
       '<div class="card-poster">' +
-      (m.poster_url ? '<img src="' + esc(m.poster_url) + '" alt="' + esc(m.title) + '" loading="lazy" decoding="async">' : '') +
+      (m.poster_url ? '<img src="' + esc(timg(m.poster_url, 'w342')) + '" alt="' + esc(m.title) + '" loading="lazy" decoding="async">' : '') +
       '<div class="card-play"><span>▶</span></div></div>' +
       '<div class="card-info"><div class="card-title">' + esc(m.title) + '</div>' +
       '<div class="card-sub"><span>' + esc(m.year || '') + '</span>' + rating + '</div></div></a>';
@@ -62,8 +67,8 @@
       }
       if (!m) { document.getElementById('dTitle').textContent = 'Movie not found'; return; }
 
-      document.getElementById('dBackdrop').src = m.backdrop_url || m.poster_url || '';
-      document.getElementById('dPoster').src = m.poster_url || '';
+      document.getElementById('dBackdrop').src = timg(m.backdrop_url, 'w1280') || timg(m.poster_url, 'w780') || '';
+      document.getElementById('dPoster').src = timg(m.poster_url, 'w500') || '';
       document.getElementById('dTitle').textContent = m.title || '';
       if (m.quality) document.getElementById('dTitle').innerHTML = esc(m.title || '') + ' <span class="d-quality">' + esc(m.quality) + '</span>';
       document.getElementById('dMeta').innerHTML =
