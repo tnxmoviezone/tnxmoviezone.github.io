@@ -427,6 +427,8 @@ function openMovieModal(id) {
   renderTypeSelect(m ? (m.content_type || 'Movie') : 'Movie');
   $('mLang').value = m ? (m.language || '') : '';
   $('mCountry').value = m ? (m.country || '') : '';
+  $('mAudio').value = m ? (m.audio || '') : '';
+  $('mSub').value = m ? (m.subtitle || '') : '';
   $('mTmdb').value = m ? (m.tmdb_id || '') : '';
   $('mRating').value = m ? (m.rating || '') : '';
   $('mDuration').value = m ? (m.duration || '') : '';
@@ -585,6 +587,8 @@ function collectMovie() {
     genre: $('mGenre').value.trim(),
     language: $('mLang').value.trim(),
     country: $('mCountry').value.trim(),
+    audio: $('mAudio').value.trim(),
+    subtitle: $('mSub').value.trim(),
     tmdb_id: $('mTmdb').value.trim(),
     rating: $('mRating').value.trim(),
     duration: $('mDuration').value.trim(),
