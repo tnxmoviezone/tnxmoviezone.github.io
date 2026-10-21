@@ -1,12 +1,40 @@
 /* TNxMovieZone — new movie alerts + auto-update */
 var CHECK_MS = 30 * 60 * 1000;
 
+var IMG_CACHE = 'tmdb-img-v1';
+
 self.addEventListener('install', function (e) { self.skipWaiting(); });
 self.addEventListener('activate', function (e) {
   e.waitUntil(
     caches.keys().then(function (keys) {
-      return Promise.all(keys.map(function (k) { return caches.delete(k); }));
+      return Promise.all(keys.map(function (k) { return k === IMG_CACHE ? null : caches.delete(k); }));
     }).then(function () { return self.clients.claim(); })
+  );
+});
+
+/* TMDB posters/backdrops: cache-first (their URLs are immutable), so repeat visits load images instantly */
+self.addEventListener('fetch', function (e) {
+  if (e.request.method !== 'GET') return;
+  var u;
+  try { u = new URL(e.request.url); } catch (err) { return; }
+  if (u.hostname !== 'image.tmdb.org') return;
+  e.respondWith(
+    caches.open(IMG_CACHE).then(function (cache) {
+      return cache.match(e.request).then(function (hit) {
+        if (hit) return hit;
+        return fetch(e.request).then(function (res) {
+          if (res && (res.status === 200 || res.type === 'opaque')) {
+            cache.put(e.request, res.clone());
+            cache.keys().then(function (keys) {
+              if (keys.length > 150) {
+                keys.slice(0, keys.length - 150).forEach(function (k) { cache.delete(k); });
+              }
+            });
+          }
+          return res;
+        });
+      });
+    })
   );
 });
 
