@@ -46,6 +46,42 @@
     return String(url).replace('image.tmdb.org/t/p/original/', 'image.tmdb.org/t/p/' + size + '/');
   }
 
+  /* ---------- toast (was called but never defined — fixed) ---------- */
+  var toastTimer = null;
+  function toast(msg, ms) {
+    var t = document.getElementById('toast');
+    if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); }
+    t.textContent = msg;
+    t.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove('show'); }, ms || 3000);
+  }
+
+  /* ---------- skeleton loading ---------- */
+  function skelCards(n) {
+    var h = '';
+    for (var i = 0; i < n; i++) {
+      h += '<div class="skel-card"><div class="skel-poster shimmer"></div><div class="skel-line shimmer" style="width:82%"></div><div class="skel-line shimmer" style="width:52%"></div></div>';
+    }
+    return h;
+  }
+  function showSkeletons() {
+    var hero = document.getElementById('hero');
+    if (hero) hero.classList.add('skel-on');
+    var t = document.getElementById('trendingRow');
+    var l = document.getElementById('latestRow');
+    if (t && !t.innerHTML) t.innerHTML = skelCards(6);
+    if (l && !l.innerHTML) l.innerHTML = skelCards(6);
+  }
+  function clearSkeletons() {
+    var hero = document.getElementById('hero');
+    if (hero) hero.classList.remove('skel-on');
+    ['trendingRow', 'latestRow'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el && el.querySelector('.skel-card')) el.innerHTML = '';
+    });
+  }
+
   /* ---------- watchlist ---------- */
   function getWatchlist() {
     try { return JSON.parse(localStorage.getItem('tnx_watchlist') || '[]'); } catch (e) { return []; }
@@ -520,9 +556,86 @@
   }
 
   /* ---------- boot ---------- */
+  /* ---------- hover-expand preview (desktop) ---------- */
+  function initHoverCard() {
+    if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+    if (document.getElementById('hoverCard')) return;
+    var hc = document.createElement('div');
+    hc.id = 'hoverCard';
+    document.body.appendChild(hc);
+    var timer = null, currentCard = null, open = false;
+
+    function movieFromCard(card) {
+      var href = card.getAttribute('href') || '';
+      var mm = /[?&]id=([^&]+)/.exec(href);
+      if (!mm) return null;
+      var id = decodeURIComponent(mm[1]);
+      for (var i = 0; i < movies.length; i++) if (String(movies[i].id) === id) return movies[i];
+      return null;
+    }
+    function fill(m) {
+      var img = timg(m.backdrop_url, 'w780') || timg(m.poster_url, 'w500') || '';
+      var meta = (m.rating ? '<span class="imdb">★ ' + esc(m.rating) + '</span>' : '') +
+        (m.year ? '<span>' + esc(m.year) + '</span>' : '') +
+        (m.duration ? '<span>' + esc(m.duration) + '</span>' : '') +
+        (m.quality ? '<span>' + esc(m.quality) + '</span>' : '') +
+        (m.genre ? '<span>' + esc(m.genre) + '</span>' : '');
+      var inWl = isInWatchlist(m.id);
+      hc.innerHTML =
+        '<div class="hc-media">' + (img ? '<img src="' + esc(img) + '" alt="">' : '') + '<div class="hc-grad"></div></div>' +
+        '<div class="hc-body"><div class="hc-title">' + esc(m.title) + '</div>' +
+        '<div class="hc-meta">' + meta + '</div>' +
+        (m.description ? '<p class="hc-desc">' + esc(m.description) + '</p>' : '') +
+        '<div class="hc-actions"><a class="hc-btn hc-play" href="movie.html?id=' + encodeURIComponent(m.id) + '">▶ Watch Now</a>' +
+        '<button type="button" class="hc-btn hc-wl" data-hcwl="1">' + (inWl ? '❤️ In List' : '🤍 My List') + '</button></div></div>';
+      var b = hc.querySelector('[data-hcwl]');
+      if (b) b.onclick = function () {
+        toggleWatchlist(m.id);
+        b.textContent = isInWatchlist(m.id) ? '❤️ In List' : '🤍 My List';
+      };
+    }
+    function show(card) {
+      var m = movieFromCard(card);
+      if (!m) return;
+      fill(m);
+      var r = card.getBoundingClientRect();
+      var w = Math.min(320, window.innerWidth - 16);
+      hc.style.width = w + 'px';
+      var h = hc.offsetHeight;
+      var left = Math.max(8, Math.min(r.left + r.width / 2 - w / 2, window.innerWidth - w - 8));
+      var top = Math.max(8, Math.min(r.top + r.height / 2 - h / 2, window.innerHeight - h - 8));
+      hc.style.left = left + 'px';
+      hc.style.top = top + 'px';
+      hc.classList.add('show');
+      open = true;
+    }
+    function hide() { hc.classList.remove('show'); open = false; currentCard = null; }
+    document.addEventListener('mouseover', function (e) {
+      var card = e.target.closest ? e.target.closest('.card') : null;
+      if (card && card !== currentCard) {
+        currentCard = card;
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(function () { if (currentCard === card) show(card); }, 450);
+      }
+    });
+    document.addEventListener('mouseout', function (e) {
+      var card = e.target.closest ? e.target.closest('.card') : null;
+      if (card && card === currentCard && !card.contains(e.relatedTarget)) {
+        if (timer) clearTimeout(timer);
+        currentCard = null;
+        if (open) setTimeout(function () { if (!hc.matches(':hover')) hide(); }, 160);
+      }
+    });
+    hc.addEventListener('mouseleave', hide);
+    window.addEventListener('scroll', function () { if (timer) clearTimeout(timer); if (open) hide(); }, { passive: true, capture: true });
+    window.addEventListener('resize', hide);
+  }
+
   function boot() {
     initTheme();
     document.getElementById('year').textContent = new Date().getFullYear();
+    showSkeletons();
+    initHoverCard();
     Promise.all([
       fetchJSON('data/movies.json').catch(function () { return []; }),
       fetchJSON('data/settings.json').catch(function () { return null; })
@@ -541,6 +654,9 @@
       if (heroList.length) { setHero(heroList); restartHero(heroList); }
       else { document.getElementById('heroTitle').textContent = 'No movies yet'; }
       applyFilter();
+      var heroEl = document.getElementById('hero');
+      if (heroEl) heroEl.classList.remove('skel-on');
+      if (window.__hidePre) window.__hidePre();
       initSearch();
       initNotif();
       initRequest();
@@ -551,6 +667,8 @@
         tgBtn.style.display = '';
       }
     }).catch(function () {
+      clearSkeletons();
+      if (window.__hidePre) window.__hidePre();
       document.getElementById('heroTitle').textContent = 'Failed to load catalog';
     });
   }
