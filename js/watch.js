@@ -153,6 +153,8 @@
   /* ---------- episodes ---------- */
   var episodes = [];      // [{n, title, url}]
   var activeEp = 0;
+  var EP_CHUNK = 50;
+  var activeRange = 0;
   function isWebSeries() {
     if (episodes.length) return true;
     var ct = movie && movie.content_type ? String(movie.content_type).toLowerCase() : '';
@@ -193,7 +195,38 @@
         toast(tgl.checked ? 'Auto-next ON' : 'Auto-next OFF');
       };
     }
-    episodes.forEach(function (ep, i) {
+    /* range selector — long series are chunked 50 at a time */
+    var rangeSel = document.getElementById('epRange');
+    var rangeCount = Math.ceil(episodes.length / EP_CHUNK);
+    if (activeRange > rangeCount - 1) activeRange = rangeCount - 1;
+    if (activeRange < 0) activeRange = 0;
+    var start = activeRange * EP_CHUNK;
+    var end = Math.min(episodes.length, start + EP_CHUNK);
+    if (rangeCount > 1 && rangeSel) {
+      rangeSel.style.display = '';
+      if (rangeSel.getAttribute('data-count') !== String(rangeCount)) {
+        var opts = '';
+        for (var r2 = 0; r2 < rangeCount; r2++) {
+          var s2 = r2 * EP_CHUNK, e2 = Math.min(episodes.length, s2 + EP_CHUNK) - 1;
+          opts += '<option value="' + r2 + '">EP ' + episodes[s2].n + ' – ' + episodes[e2].n + '</option>';
+        }
+        rangeSel.innerHTML = opts;
+        rangeSel.setAttribute('data-count', String(rangeCount));
+      }
+      rangeSel.value = String(activeRange);
+      if (!rangeSel._bound) {
+        rangeSel._bound = true;
+        rangeSel.onchange = function () {
+          activeRange = parseInt(rangeSel.value, 10) || 0;
+          renderEpisodes();
+          grid.scrollTop = 0;
+        };
+      }
+    } else if (rangeSel) {
+      rangeSel.style.display = 'none';
+    }
+    episodes.slice(start, end).forEach(function (ep, j) {
+      var i = start + j;
       var b = document.createElement('button');
       b.type = 'button';
       b.className = 'ep-btn' + (i === activeEp ? ' on' : '');
@@ -218,6 +251,7 @@
     if (i < 0 || i >= episodes.length) return;
     hideAutoNextOverlay();
     activeEp = i;
+    activeRange = Math.floor(i / EP_CHUNK);
     var ep = episodes[i];
     renderEpisodes();
     // save progress
