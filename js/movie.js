@@ -15,6 +15,8 @@
     return String(url).replace('image.tmdb.org/t/p/original/', 'image.tmdb.org/t/p/' + size + '/');
   }
 
+  function T(s) { return window.tr ? window.tr(s) : s; }
+
   var allMovies = [];
   var toastTimer = null;
   function toast(msg, ms) {
@@ -47,12 +49,13 @@
 
   function cardHTML(m, i) {
     var rating = m.rating ? '<span class="imdb">★ ' + esc(m.rating) + '</span>' : '';
+    var dubbadge = m.audio ? '<span class="dub-badge">🎧 ' + esc(m.audio) + '</span>' : (m.subtitle ? '<span class="dub-badge">💬 ' + esc(m.subtitle) + '</span>' : '');
     return '<a class="card" href="movie.html?id=' + encodeURIComponent(m.id) + '" style="animation-delay:' + (i * 40) + 'ms">' +
       '<div class="card-poster">' +
       (m.poster_url ? '<img src="' + esc(timg(m.poster_url, 'w342')) + '" alt="' + esc(m.title) + '" loading="lazy" decoding="async">' : '') +
       '<div class="card-play"><span>▶</span></div></div>' +
       '<div class="card-info"><div class="card-title">' + esc(m.title) + '</div>' +
-      '<div class="card-sub"><span>' + esc(m.year || '') + '</span>' + rating + '</div></div></a>';
+      '<div class="card-sub"><span>' + esc(m.year || '') + '</span>' + rating + dubbadge + '</div></div></a>';
   }
 
   /* ---------- hover-expand preview (desktop, related cards) ---------- */
@@ -164,7 +167,7 @@
     initHoverCard();
     document.getElementById('year').textContent = new Date().getFullYear();
     var id = qs('id');
-    if (!id) { document.body.classList.remove('detail-loading'); document.getElementById('dTitle').textContent = 'Movie not found'; return; }
+    if (!id) { document.body.classList.remove('detail-loading'); document.getElementById('dTitle').textContent = T('Movie not found'); return; }
 
     Promise.all([
       fetchJSON('data/movies.json').catch(function () { return []; }),
@@ -182,7 +185,7 @@
       for (var i = 0; i < movies.length; i++) {
         if (String(movies[i].id) === String(id)) { m = movies[i]; break; }
       }
-      if (!m) { document.body.classList.remove('detail-loading'); document.getElementById('dTitle').textContent = 'Movie not found'; return; }
+      if (!m) { document.body.classList.remove('detail-loading'); document.getElementById('dTitle').textContent = T('Movie not found'); return; }
 
       document.getElementById('dBackdrop').src = timg(m.backdrop_url, 'w1280') || timg(m.poster_url, 'w780') || '';
       document.getElementById('dPoster').src = timg(m.poster_url, 'w500') || '';
@@ -200,6 +203,8 @@
       if (m.genre) extra.push(['Genre', m.genre]);
       if (m.language) extra.push(['Language', m.language]);
       if (m.country) extra.push(['Country', m.country]);
+      if (m.audio) extra.push([T('Audio'), m.audio]);
+      if (m.subtitle) extra.push([T('Subtitle'), m.subtitle]);
       if (m.release_date) extra.push(['Release Date', m.release_date]);
       document.getElementById('dExtra').innerHTML = extra.map(function (e) {
         return '<div class="extra-box"><div class="k">' + esc(e[0]) + '</div><div class="v">' + esc(e[1]) + '</div></div>';
@@ -299,7 +304,7 @@
           (x.genre || '').toLowerCase().indexOf(g) > -1;
       }).slice(0, 15);
       document.getElementById('relatedRow').innerHTML =
-        rel.length ? rel.map(cardHTML).join('') : '<div class="empty">No related titles.</div>';
+        rel.length ? rel.map(cardHTML).join('') : '<div class="empty">' + T('No related titles.') + '</div>';
     });
   }
 
