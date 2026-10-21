@@ -10,6 +10,7 @@
   var activeLang = 'All';
   var activeYear = 'All';
   var minRating = 0;
+  var activeSort = 'default';
 
   /* ---------- theme ---------- */
   function initTheme() {
@@ -294,6 +295,33 @@
     sel.onchange = function () { minRating = parseFloat(sel.value) || 0; applyFilter(); };
   }
 
+  function sortList(list) {
+    if (activeSort === 'newest') {
+      return list.slice().sort(function (a, b) {
+        return String(b.release_date || b.year || '').localeCompare(String(a.release_date || a.year || ''));
+      });
+    }
+    if (activeSort === 'rating') {
+      return list.slice().sort(function (a, b) {
+        var d = parseFloat(b.rating || '0') - parseFloat(a.rating || '0');
+        return d !== 0 ? d : String(a.title || '').localeCompare(String(b.title || ''));
+      });
+    }
+    if (activeSort === 'az') {
+      return list.slice().sort(function (a, b) {
+        return String(a.title || '').localeCompare(String(b.title || ''));
+      });
+    }
+    return list;
+  }
+
+  function bindSortFilter() {
+    var sel = document.getElementById('sortFilter');
+    if (!sel || sel._bound) return;
+    sel._bound = true;
+    sel.onchange = function () { activeSort = sel.value || 'default'; applyFilter(); };
+  }
+
   function renderContinueWatching() {
     var sec = document.getElementById('continueSec');
     var row = document.getElementById('continueRow');
@@ -357,15 +385,26 @@
         /* default: genre match */
         return (m.genre || '').toLowerCase().split(/[,\/]/).map(function (s) { return s.trim(); }).indexOf(catL) > -1;
       });
-      renderRow('trendingRow', f);
+      renderRow('trendingRow', sortList(f));
       renderRow('latestRow', []);
       document.getElementById('latest').style.display = 'none';
+      renderCatRows(vis);
+    } else if (activeSort !== 'default') {
+      document.getElementById('latest').style.display = '';
+      document.getElementById('trending').style.display = 'none';
+      var lt = document.querySelector('#latest .row-title');
+      if (lt) lt.textContent = { newest: 'Newest First', rating: 'Top Rated', az: 'A – Z' }[activeSort] || 'Latest Release';
+      renderRow('latestRow', sortList(vis).slice(0, 20));
+      renderCatRows([]);
     } else {
       document.getElementById('latest').style.display = '';
+      document.getElementById('trending').style.display = '';
+      var lt2 = document.querySelector('#latest .row-title');
+      if (lt2) lt2.textContent = 'Latest Release';
       renderRow('trendingRow', trending.length ? trending : vis.slice(0, 20));
       renderRow('latestRow', latest);
+      renderCatRows(sortList(vis));
     }
-    renderCatRows(vis);
   }
 
   function renderCatRows(vis) {
@@ -647,6 +686,7 @@
       renderLangChips();
       renderYearFilter();
       bindRatingFilter();
+      bindSortFilter();
       renderContinueWatching();
       renderWatchlistRow();
       var featured = movies.filter(listed).filter(function (m) { return m.is_featured; });
