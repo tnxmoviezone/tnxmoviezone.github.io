@@ -14,6 +14,17 @@
     if (!url) return url;
     return String(url).replace('image.tmdb.org/t/p/original/', 'image.tmdb.org/t/p/' + size + '/');
   }
+
+  var allMovies = [];
+  var toastTimer = null;
+  function toast(msg, ms) {
+    var t = document.getElementById('toast');
+    if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); }
+    t.textContent = msg;
+    t.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove('show'); }, ms || 3000);
+  }
   function fetchJSON(url) {
     return fetch(url + (url.indexOf('?') > -1 ? '&' : '?') + 't=' + Date.now())
       .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
@@ -44,17 +55,87 @@
       '<div class="card-sub"><span>' + esc(m.year || '') + '</span>' + rating + '</div></div></a>';
   }
 
+  /* ---------- hover-expand preview (desktop, related cards) ---------- */
+  function initHoverCard() {
+    if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+    if (document.getElementById('hoverCard')) return;
+    var hc = document.createElement('div');
+    hc.id = 'hoverCard';
+    document.body.appendChild(hc);
+    var timer = null, currentCard = null, open = false;
+    function movieFromCard(card) {
+      var href = card.getAttribute('href') || '';
+      var mm = /[?&]id=([^&]+)/.exec(href);
+      if (!mm) return null;
+      var id = decodeURIComponent(mm[1]);
+      for (var i = 0; i < allMovies.length; i++) if (String(allMovies[i].id) === id) return allMovies[i];
+      return null;
+    }
+    function fill(m) {
+      var img = timg(m.backdrop_url, 'w780') || timg(m.poster_url, 'w500') || '';
+      var meta = (m.rating ? '<span class="imdb">★ ' + esc(m.rating) + '</span>' : '') +
+        (m.year ? '<span>' + esc(m.year) + '</span>' : '') +
+        (m.duration ? '<span>' + esc(m.duration) + '</span>' : '') +
+        (m.quality ? '<span>' + esc(m.quality) + '</span>' : '') +
+        (m.genre ? '<span>' + esc(m.genre) + '</span>' : '');
+      hc.innerHTML =
+        '<div class="hc-media">' + (img ? '<img src="' + esc(img) + '" alt="">' : '') + '<div class="hc-grad"></div></div>' +
+        '<div class="hc-body"><div class="hc-title">' + esc(m.title) + '</div>' +
+        '<div class="hc-meta">' + meta + '</div>' +
+        (m.description ? '<p class="hc-desc">' + esc(m.description) + '</p>' : '') +
+        '<div class="hc-actions"><a class="hc-btn hc-play" href="movie.html?id=' + encodeURIComponent(m.id) + '">▶ Watch Now</a></div></div>';
+    }
+    function show(card) {
+      var m = movieFromCard(card);
+      if (!m) return;
+      fill(m);
+      var r = card.getBoundingClientRect();
+      var w = Math.min(320, window.innerWidth - 16);
+      hc.style.width = w + 'px';
+      var h = hc.offsetHeight;
+      var left = Math.max(8, Math.min(r.left + r.width / 2 - w / 2, window.innerWidth - w - 8));
+      var top = Math.max(8, Math.min(r.top + r.height / 2 - h / 2, window.innerHeight - h - 8));
+      hc.style.left = left + 'px';
+      hc.style.top = top + 'px';
+      hc.classList.add('show');
+      open = true;
+    }
+    function hide() { hc.classList.remove('show'); open = false; currentCard = null; }
+    document.addEventListener('mouseover', function (e) {
+      var card = e.target.closest ? e.target.closest('.card') : null;
+      if (card && card !== currentCard) {
+        currentCard = card;
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(function () { if (currentCard === card) show(card); }, 450);
+      }
+    });
+    document.addEventListener('mouseout', function (e) {
+      var card = e.target.closest ? e.target.closest('.card') : null;
+      if (card && card === currentCard && !card.contains(e.relatedTarget)) {
+        if (timer) clearTimeout(timer);
+        currentCard = null;
+        if (open) setTimeout(function () { if (!hc.matches(':hover')) hide(); }, 160);
+      }
+    });
+    hc.addEventListener('mouseleave', hide);
+    window.addEventListener('scroll', function () { if (timer) clearTimeout(timer); if (open) hide(); }, { passive: true, capture: true });
+    window.addEventListener('resize', hide);
+  }
+
   function boot() {
     initTheme();
+    document.body.classList.add('detail-loading');
+    initHoverCard();
     document.getElementById('year').textContent = new Date().getFullYear();
     var id = qs('id');
-    if (!id) { document.getElementById('dTitle').textContent = 'Movie not found'; return; }
+    if (!id) { document.body.classList.remove('detail-loading'); document.getElementById('dTitle').textContent = 'Movie not found'; return; }
 
     Promise.all([
       fetchJSON('data/movies.json').catch(function () { return []; }),
       fetchJSON('data/settings.json').catch(function () { return null; })
     ]).then(function (res) {
       var movies = Array.isArray(res[0]) ? res[0] : [];
+      allMovies = movies;
       var settings = res[1];
       if (settings && settings.site_name) {
         document.title = 'Movie — ' + settings.site_name;
@@ -65,7 +146,7 @@
       for (var i = 0; i < movies.length; i++) {
         if (String(movies[i].id) === String(id)) { m = movies[i]; break; }
       }
-      if (!m) { document.getElementById('dTitle').textContent = 'Movie not found'; return; }
+      if (!m) { document.body.classList.remove('detail-loading'); document.getElementById('dTitle').textContent = 'Movie not found'; return; }
 
       document.getElementById('dBackdrop').src = timg(m.backdrop_url, 'w1280') || timg(m.poster_url, 'w780') || '';
       document.getElementById('dPoster').src = timg(m.poster_url, 'w500') || '';
@@ -89,6 +170,8 @@
       }).join('');
 
       document.getElementById('dWatch').href = 'watch.html?id=' + encodeURIComponent(m.id);
+      document.body.classList.remove('detail-loading');
+      if (window.__hidePre) window.__hidePre();
       /* trailer button */
       var trBtn = document.getElementById('dTrailer');
       if (trBtn) {
@@ -142,6 +225,7 @@
             try { localStorage.setItem(key, String(v)); } catch (e) {}
             draw(v);
             if (info) info.textContent = 'Tumi ' + v + '/5 diso';
+            toast('Rating save hoise — ' + v + '★');
           };
         });
       })();
