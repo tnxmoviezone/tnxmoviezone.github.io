@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=16">
+<link rel="stylesheet" href="css/style.css?v=17">
 <link rel="icon" href="logo/logo.png" type="image/png">
 </head>
 <body>
@@ -28,16 +28,17 @@ setTimeout(window.__hidePre,4000);
   <div class="wrap header-inner">
     <a href="index.html" class="logo" id="siteLogo">TNxMovieZone</a>
     <nav class="nav">
-      <a href="index.html" class="active">Home</a>
-      <a href="index.html#trending">Trending</a>
-      <a href="index.html#latest">Release</a>
+      <a href="index.html" class="active" data-i18n="Home">Home</a>
+      <a href="index.html#trending" data-i18n="Trending">Trending</a>
+      <a href="index.html#latest" data-i18n="Release">Release</a>
     </nav>
     <div class="header-search">
       <span class="icon">🔍</span>
-      <input type="text" id="searchInput" placeholder="Search movies..." autocomplete="off">
+      <input type="text" id="searchInput" placeholder="Search movies..." data-i18n-ph="Search movies..." autocomplete="off">
       <div class="search-results" id="searchResults"></div>
     </div>
     <button class="icon-btn" id="themeToggle" title="Toggle theme">🌙</button>
+    <button class="icon-btn langToggle" title="Language" style="font-size:.7rem;font-weight:800;width:auto;padding:0 10px;">বাং</button>
     <button class="icon-btn" id="notifToggle" title="New movie alerts">🔔</button>
     <button class="icon-btn" id="requestBtn" title="Request a movie">💬</button>
     <a class="icon-btn" id="tgJoinBtn" href="#" target="_blank" rel="noopener" title="Join Telegram" style="display:none;text-decoration:none;">✈️</a>
@@ -51,16 +52,16 @@ setTimeout(window.__hidePre,4000);
   <div class="notice-modal">
     <button class="notice-close" id="requestClose" aria-label="Close">✕</button>
     <div class="notice-modal-icon">💬</div>
-    <h3>Request a Movie</h3>
-    <input type="text" id="reqTitle" placeholder="Movie/Series name..." style="width:100%;margin:8px 0;padding:10px;border-radius:8px;border:1px solid var(--glass-border);background:var(--bg-soft);color:var(--text);">
-    <input type="text" id="reqYear" placeholder="Year (optional)..." style="width:100%;margin:8px 0;padding:10px;border-radius:8px;border:1px solid var(--glass-border);background:var(--bg-soft);color:var(--text);">
-    <button type="button" class="btn btn-grad" id="reqSend" style="width:100%;margin-top:8px;">Send Request</button>
+    <h3 data-i18n="Request a Movie">Request a Movie</h3>
+    <input type="text" id="reqTitle" placeholder="Movie/Series name..." data-i18n-ph="Movie/Series name..." style="width:100%;margin:8px 0;padding:10px;border-radius:8px;border:1px solid var(--glass-border);background:var(--bg-soft);color:var(--text);">
+    <input type="text" id="reqYear" placeholder="Year (optional)..." data-i18n-ph="Year (optional)..." style="width:100%;margin:8px 0;padding:10px;border-radius:8px;border:1px solid var(--glass-border);background:var(--bg-soft);color:var(--text);">
+    <button type="button" class="btn btn-grad" id="reqSend" style="width:100%;margin-top:8px;" data-i18n="Send Request">Send Request</button>
   </div>
 </div>
   <div class="notice-modal">
     <button class="notice-close" id="noticeClose" aria-label="Close">✕</button>
     <div class="notice-modal-icon">📢</div>
-    <h3>Announcement</h3>
+    <h3 data-i18n="Announcement">Announcement</h3>
     <p id="noticeText"></p>
   </div>
 </div>
@@ -73,14 +74,14 @@ setTimeout(window.__hidePre,4000);
     <div class="hero-bg"><img id="heroBg" src="" alt=""></div>
     <div class="hero-shade"></div>
     <div class="hero-content">
-      <span class="hero-badge" id="heroBadge">✨ Featured</span>
+      <span class="hero-badge" id="heroBadge" data-i18n="✨ Featured">✨ Featured</span>
       <h1 class="hero-title" id="heroTitle">Loading...</h1>
       <div class="hero-meta" id="heroMeta"></div>
       <p class="hero-desc" id="heroDesc"></p>
       <div class="hero-cast" id="heroCast"></div>
       <div class="hero-actions">
-        <a class="btn btn-grad" id="heroWatch" href="#">▶ Watch Now</a>
-        <a class="btn btn-ghost" id="heroInfo" href="#">More Info</a>
+        <a class="btn btn-grad" id="heroWatch" href="#" data-i18n="▶ Watch Now">▶ Watch Now</a>
+        <a class="btn btn-ghost" id="heroInfo" href="#" data-i18n="More Info">More Info</a>
       </div>
     </div>
     <div class="hero-dots" id="heroDots"></div>
@@ -94,27 +95,27 @@ setTimeout(window.__hidePre,4000);
   <div class="chips" id="advFilters" style="margin-top:8px;align-items:center;">
     <span style="font-size:.75rem;color:var(--text-faint);margin-right:4px;">🔍</span>
     <select id="yearFilter" class="chip" style="appearance:auto;padding:8px 12px;cursor:pointer;">
-      <option value="All">📅 All Years</option>
+      <option value="All" data-i18n="📅 All Years">📅 All Years</option>
     </select>
     <select id="ratingFilter" class="chip" style="appearance:auto;padding:8px 12px;cursor:pointer;">
-      <option value="0">⭐ Any Rating</option>
-      <option value="7">⭐ 7+</option>
-      <option value="8">⭐ 8+</option>
-      <option value="9">⭐ 9+</option>
+      <option value="0" data-i18n="⭐ Any Rating">⭐ Any Rating</option>
+      <option value="7" data-i18n="⭐ 7+">⭐ 7+</option>
+      <option value="8" data-i18n="⭐ 8+">⭐ 8+</option>
+      <option value="9" data-i18n="⭐ 9+">⭐ 9+</option>
     </select>
     <select id="sortFilter" class="chip" style="appearance:auto;padding:8px 12px;cursor:pointer;">
-      <option value="default">↕ Default Sort</option>
-      <option value="newest">🆕 Newest First</option>
-      <option value="rating">⭐ Top Rated</option>
-      <option value="az">🔤 A – Z</option>
+      <option value="default" data-i18n="↕ Default Sort">↕ Default Sort</option>
+      <option value="newest" data-i18n="🆕 Newest First">🆕 Newest First</option>
+      <option value="rating" data-i18n="⭐ Top Rated">⭐ Top Rated</option>
+      <option value="az" data-i18n="🔤 A – Z">🔤 A – Z</option>
     </select>
   </div>
 
   <!-- Full-screen search results -->
   <section class="row-sec" id="searchSec" style="display:none;">
     <div class="row-head">
-      <h2 class="row-title">🔍 Search Results <span id="searchCount" style="font-size:.8rem;color:var(--text-faint);"></span></h2>
-      <button type="button" class="btn btn-ghost btn-sm" id="searchClose">✕ Clear</button>
+      <h2 class="row-title"><span data-i18n="🔍 Search Results">🔍 Search Results</span> <span id="searchCount" style="font-size:.8rem;color:var(--text-faint);"></span></h2>
+      <button type="button" class="btn btn-ghost btn-sm" id="searchClose" data-i18n="✕ Clear">✕ Clear</button>
     </div>
     <div class="search-grid" id="searchGrid"></div>
   </section>
@@ -122,8 +123,8 @@ setTimeout(window.__hidePre,4000);
   <!-- Continue Watching -->
   <section class="row-sec" id="continueSec" style="display:none;">
     <div class="row-head">
-      <h2 class="row-title">▶ Continue Watching</h2>
-      <button type="button" class="btn btn-ghost btn-sm" id="clearContinue">Clear</button>
+      <h2 class="row-title" data-i18n="▶ Continue Watching">▶ Continue Watching</h2>
+      <button type="button" class="btn btn-ghost btn-sm" id="clearContinue" data-i18n="Clear">Clear</button>
     </div>
     <div class="poster-row" id="continueRow"></div>
   </section>
@@ -131,7 +132,7 @@ setTimeout(window.__hidePre,4000);
   <!-- Watchlist -->
   <section class="row-sec" id="watchlistSec" style="display:none;">
     <div class="row-head">
-      <h2 class="row-title">❤️ My Watchlist</h2>
+      <h2 class="row-title" data-i18n="❤️ My Watchlist">❤️ My Watchlist</h2>
     </div>
     <div class="poster-row" id="watchlistRow"></div>
   </section>
@@ -139,7 +140,7 @@ setTimeout(window.__hidePre,4000);
   <!-- Trending row -->
   <section class="row-sec" id="trending">
     <div class="row-head">
-      <h2 class="row-title">Trending Now</h2>
+      <h2 class="row-title" data-i18n="Trending Now">Trending Now</h2>
     </div>
     <div class="poster-row" id="trendingRow"></div>
   </section>
@@ -147,7 +148,7 @@ setTimeout(window.__hidePre,4000);
   <!-- Latest row -->
   <section class="row-sec" id="latest">
     <div class="row-head">
-      <h2 class="row-title">Latest Release</h2>
+      <h2 class="row-title" data-i18n="Latest Release">Latest Release</h2>
     </div>
     <div class="poster-row" id="latestRow"></div>
   </section>
@@ -158,12 +159,13 @@ setTimeout(window.__hidePre,4000);
 
 <footer class="footer">
   <div class="wrap footer-inner">
-    <span>© <span id="year"></span> <span id="footName">TNxMovieZone</span>. All rights reserved.</span>
-    <span>Made for movie lovers 🍿</span>
+    <span>© <span id="year"></span> <span id="footName">TNxMovieZone</span>. <span data-i18n="All rights reserved.">All rights reserved.</span></span>
+    <span data-i18n="Made for movie lovers 🍿">Made for movie lovers 🍿</span>
   </div>
 </footer>
 
-<script src="js/app.js?v=8"></script>
+<script src="js/i18n.js?v=1"></script>
+<script src="js/app.js?v=9"></script>
 <script>
 /* source protection */
 (function(){
