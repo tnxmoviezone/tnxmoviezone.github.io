@@ -40,6 +40,11 @@
   function esc(s) {
     return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
+  /* TMDB originals are 1-2MB each; rewrite to the size actually displayed */
+  function timg(url, size) {
+    if (!url) return url;
+    return String(url).replace('image.tmdb.org/t/p/original/', 'image.tmdb.org/t/p/' + size + '/');
+  }
 
   /* ---------- watchlist ---------- */
   function getWatchlist() {
@@ -95,7 +100,7 @@
     var rating = m.rating ? '<span class="imdb">★ ' + esc(m.rating) + '</span>' : '';
     return '<a class="card" href="movie.html?id=' + encodeURIComponent(m.id) + '" style="animation-delay:' + (i * 40) + 'ms">' +
       '<div class="card-poster">' +
-      (m.poster_url ? '<img src="' + esc(m.poster_url) + '" alt="' + esc(m.title) + '" loading="lazy" decoding="async">' : '<div style="width:100%;height:100%;display:grid;place-items:center;background:var(--grad-soft);font-size:2rem">🎬</div>') +
+      (m.poster_url ? '<img src="' + esc(timg(m.poster_url, 'w342')) + '" alt="' + esc(m.title) + '" loading="lazy" decoding="async">' : '<div style="width:100%;height:100%;display:grid;place-items:center;background:var(--grad-soft);font-size:2rem">🎬</div>') +
       badge +
       qbadge +
       abadge +
@@ -117,7 +122,7 @@
     var desc = document.getElementById('heroDesc');
     var watch = document.getElementById('heroWatch');
     var info = document.getElementById('heroInfo');
-    if (bg) bg.src = m.backdrop_url || m.poster_url || '';
+    if (bg) bg.src = timg(m.backdrop_url, 'w1280') || timg(m.poster_url, 'w780') || '';
     if (title) title.textContent = m.title || '';
     if (meta) meta.innerHTML =
       (m.rating ? '<span class="imdb">★ ' + esc(m.rating) + '</span>' : '') +
@@ -453,7 +458,7 @@
       else {
         box.innerHTML = hits.map(function (m) {
           return '<a class="sr-item" href="movie.html?id=' + encodeURIComponent(m.id) + '">' +
-            (m.poster_url ? '<img src="' + esc(m.poster_url) + '" alt="">' : '') +
+            (m.poster_url ? '<img src="' + esc(timg(m.poster_url, 'w185')) + '" alt="">' : '') +
             '<div><div class="t">' + esc(m.title) + '</div><div class="s">' + esc(m.year || '') + ' • ' + esc(m.genre || '') + '</div></div></a>';
         }).join('');
       }
